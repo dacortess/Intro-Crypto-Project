@@ -6,14 +6,24 @@ import { useToast } from "@/hooks/use-toast";
 import { analyzeText } from "@/lib/cryptography";
 
 const ANALYSIS_METHODS = [
-  { value: "multiplicative", label: "Multiplicative (Coincidence Index)" },
-  { value: "permutation", label: "Permutation (Coincidence Index)" },
+  { value: "hill", label: "Hill Cipher (Coincidence Index)" },
+  { value: "vigenere", label: "Vigenère Cipher (Coincidence Index)" },
 ];
+
+interface PossibleWord {
+  word: string;
+  key: string;
+}
+
+interface AnalysisResult {
+  possibleWords: PossibleWord[];
+  mostProbable: string;
+}
 
 export function CryptoAnalysisSection() {
   const [inputText, setInputText] = useState("");
   const [method, setMethod] = useState("");
-  const [outputText, setOutputText] = useState("");
+  const [outputText, setOutputText] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -38,7 +48,27 @@ export function CryptoAnalysisSection() {
     setIsLoading(true);
     try {
       const result = await analyzeText(inputText, method);
-      setOutputText(result);
+      try {
+        // Parse the response which is in format [[["word","key"],...], "mostProbable"]
+        const parsedData = JSON.parse(result);
+        const [possibleWordsList, mostProbable] = parsedData;
+        
+        const formattedResult: AnalysisResult = {
+          possibleWords: possibleWordsList.map(([word, key]: [string, string]) => ({
+            word,
+            key
+          })),
+          mostProbable
+        };
+        
+        setOutputText(formattedResult);
+      } catch (parseError) {
+        // If parsing fails, treat it as a simple string result
+        setOutputText({
+          possibleWords: [],
+          mostProbable: result
+        });
+      }
       toast({
         title: "Success",
         description: "Text analyzed successfully",
@@ -88,11 +118,26 @@ export function CryptoAnalysisSection() {
         </Button>
 
         {outputText && (
-          <Textarea
-            value={outputText}
-            readOnly
-            className="min-h-[200px] font-mono bg-muted"
-          />
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">Result:</h3>
+              <p className="font-mono whitespace-pre-wrap">{outputText.mostProbable}</p>
+            </div>
+            
+            {outputText.possibleWords && outputText.possibleWords.length > 0 && (
+              <div className="p-4 bg-muted rounded-lg">
+                <h3 className="text-lg font-semibold mb-2">All Possible Results:</h3>
+                <div className="space-y-1">
+                  {outputText.possibleWords.map(({ word, key }, index) => (
+                    <div key={index} className="flex items-center gap-4 font-mono">
+                      <span className="flex-1">{word}</span>
+                      <span className="text-sm text-muted-foreground">Key: {key}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

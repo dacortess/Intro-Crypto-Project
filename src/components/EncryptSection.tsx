@@ -10,9 +10,26 @@ const ENCRYPTION_METHODS = [
   { value: "caesar", label: "Caesar Cipher", params: ["a"] },
   { value: "affine", label: "Affine Cipher", params: ["a", "b"] },
   { value: "multiplicative", label: "Multiplicative Cipher", params: ["a"] },
-  { value: "rsa", label: "RSA", params: ["a", "b", "n"] },
+  { value: "rsa", label: "RSA", params: ["p", "q"] },
   { value: "permutation", label: "Permutation", params: ["m", "pi"] },
 ];
+
+const PARAM_OPTIONS = {
+  caesar: {
+    a: Array.from({ length: 25 }, (_, i) => (i + 1).toString()),
+  },
+  affine: {
+    a: Array.from({ length: 25 }, (_, i) => (i + 1).toString()).filter(n => n !== "13" && parseInt(n) % 2 !== 0),
+    b: Array.from({ length: 25 }, (_, i) => (i + 1).toString()),
+  },
+  multiplicative: {
+    a: Array.from({ length: 25 }, (_, i) => (i + 1).toString()).filter(n => n !== "13" && parseInt(n) % 2 !== 0),
+  },
+  rsa: {
+    p: ["2", "3", "79", "97", "101", "199", "227", "229", "349", "367"],
+    q: ["11", "19", "41", "113", "223", "251", "311", "401", "419"],
+  },
+};
 
 export function EncryptSection() {
   const [inputText, setInputText] = useState("");
@@ -104,19 +121,42 @@ export function EncryptSection() {
         </Select>
 
         {selectedMethod && (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
             {selectedMethod.params.map((param) => (
-              <div key={param} className="space-y-2">
+              <div key={param} className="flex flex-col gap-2">
                 <label className="text-sm font-medium">
                   Parameter {param.toUpperCase()}
                 </label>
-                <Input
-                  type="number"
-                  placeholder={`Enter ${param}`}
-                  value={params[param] || ""}
-                  onChange={(e) => handleParamChange(param, e.target.value)}
-                  className="w-full"
-                />
+                {method === "permutation" && param === "m" ? (
+                  <Input
+                    type="number"
+                    value={params[param] || ""}
+                    onChange={(e) => handleParamChange(param, e.target.value)}
+                    placeholder={`Enter the length of the permutation (e.g., 4)`}
+                  />
+                ) : method === "permutation" && param === "pi" ? (
+                  <Input
+                    value={params[param] || ""}
+                    onChange={(e) => handleParamChange(param, e.target.value)}
+                    placeholder="Enter numbers separated by spaces (e.g., 3 0 2 1)"
+                  />
+                ) : (
+                  <Select
+                    value={params[param] || ""}
+                    onValueChange={(value) => handleParamChange(param, value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={`Select parameter ${param}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PARAM_OPTIONS[method as keyof typeof PARAM_OPTIONS][param as "a" | "b"].map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
             ))}
           </div>
