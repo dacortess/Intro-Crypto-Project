@@ -1,11 +1,7 @@
 // Helper function to execute Python operations via API
 async function executePythonOperation(scriptName: string, data: any): Promise<string> {
   try {
-<<<<<<< HEAD
     const response = await fetch(`https://dacortess.pythonanywhere.com/api/python/${scriptName}`, {
-=======
-    const response = await fetch(`https://dacortess.pythonanywhere.com//api/python/${scriptName}`, {
->>>>>>> 04e067a35a1577c9c51b4f6c6878fcd8d4ce05a4
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
