@@ -35,27 +35,30 @@ export function AppSidebar({ activeSection, onSectionChange }: AppSidebarProps) 
   ];
 
   return (
-    <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Cryptography</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    className={activeSection === item.value ? "bg-primary" : ""}
-                    onClick={() => onSectionChange(item.value as "encrypt" | "decrypt" | "analysis")}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <nav className="h-full bg-background">
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+            Cryptography
+          </h2>
+          <div className="space-y-1">
+            {items.map((item) => (
+              <button
+                key={item.title}
+                onClick={() => onSectionChange(item.value as "encrypt" | "decrypt" | "analysis")}
+                className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  activeSection === item.value
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+              >
+                <item.icon className="h-5 w-5" />
+                {item.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 }
