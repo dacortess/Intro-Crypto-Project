@@ -2,7 +2,11 @@
 
 ## Project info
 
-**URL**: https://playful-flan-1c5e1c.netlify.app/
+**Web Page**: [Crypto Project](https://playful-flan-1c5e1c.netlify.app/)
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/009c662c-8130-472a-a75c-cd739ed542ea/deploy-status)](https://app.netlify.com/sites/playful-flan-1c5e1c/deploys)
+
+## Run in local
 
 **Requirements**:
 
@@ -35,3 +39,8 @@ This project is built with:
 
 - Python
 - Flask
+
+### Host Services:
+
+- Netlify
+- Pythonanywhere

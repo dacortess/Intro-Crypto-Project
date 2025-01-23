@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { encryptText } from "@/lib/cryptography";
+import { ClipboardCopy } from "lucide-react";
 
 const ENCRYPTION_METHODS = [
   { value: "caesar", label: "Caesar Cipher", params: ["a"] },
@@ -37,6 +38,7 @@ export function EncryptSection() {
   const [outputText, setOutputText] = useState("");
   const [params, setParams] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const { toast } = useToast();
 
   const selectedMethod = ENCRYPTION_METHODS.find(m => m.value === method);
@@ -89,6 +91,26 @@ export function EncryptSection() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!outputText) return;
+    setIsCopying(true);
+    try {
+      await navigator.clipboard.writeText(outputText);
+      toast({
+        title: "Copied!",
+        description: "Text copied to clipboard",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy text",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCopying(false);
     }
   };
 
@@ -171,11 +193,30 @@ export function EncryptSection() {
         </Button>
 
         {outputText && (
-          <Textarea
-            value={outputText}
-            readOnly
-            className="min-h-[200px] font-mono bg-muted"
-          />
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <Textarea
+                value={outputText}
+                readOnly
+                className="min-h-[200px] font-mono bg-muted"
+              />
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-12 w-12 shrink-0"
+                  onClick={handleCopy}
+                  disabled={isCopying}
+                >
+                  <ClipboardCopy className="h-5 w-5" />
+                  <span className="sr-only">Copy to clipboard</span>
+                </Button>
+                <span className="text-xs text-muted-foreground text-center w-full">
+                  {isCopying ? "Copying..." : "Copy text"}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
