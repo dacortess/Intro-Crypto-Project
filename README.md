@@ -3,6 +3,7 @@
 ## Project info
 
 **Web Page**: [Crypto Project](https://playful-flan-1c5e1c.netlify.app/)
+
 **Backend Repo**: [Crypto Algorithms]([https://playful-flan-1c5e1c.netlify.app/](https://github.com/dacortess/Intro-Crypto-Algorithms))
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/009c662c-8130-472a-a75c-cd739ed542ea/deploy-status)](https://app.netlify.com/sites/playful-flan-1c5e1c/deploys)
