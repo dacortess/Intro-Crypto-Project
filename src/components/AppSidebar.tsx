@@ -1,38 +1,33 @@
 import { Lock, Unlock, Search } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { useState } from "react";
 
 interface AppSidebarProps {
-  activeSection: "encrypt" | "decrypt" | "analysis";
-  onSectionChange: (section: "encrypt" | "decrypt" | "analysis") => void;
+  activeSection: string;
+  onSectionChange: (section: string) => void;
 }
 
 export function AppSidebar({ activeSection, onSectionChange }: AppSidebarProps) {
-  const items = [
-    {
-      title: "Encrypt",
-      value: "encrypt",
-      icon: Lock,
-    },
-    {
-      title: "Decrypt",
-      value: "decrypt",
-      icon: Unlock,
-    },
-    {
-      title: "Analysis",
-      value: "analysis",
-      icon: Search,
-    },
+  const [expandedSection, setExpandedSection] = useState<"encrypt" | "decrypt" | null>(null);
+
+  const encryptItems = [
+    { title: "Classic", value: "encrypt-classic" },
+    { title: "Symmetric Key", value: "encrypt-symmetric" },
+    { title: "Public Key", value: "encrypt-public" },
+    { title: "Digital Signature", value: "encrypt-signature" },
+    { title: "Images", value: "encrypt-images" },
   ];
+
+  const decryptItems = [
+    { title: "Classic", value: "decrypt-classic" },
+    { title: "Symmetric Key", value: "decrypt-symmetric" },
+    { title: "Public Key", value: "decrypt-public" },
+    { title: "Digital Signature", value: "decrypt-signature" },
+    { title: "Images", value: "decrypt-images" },
+  ];
+
+  const handleMainButtonClick = (section: "encrypt" | "decrypt") => {
+    setExpandedSection(expandedSection === section ? null : section);
+  };
 
   return (
     <nav className="h-full bg-background">
@@ -42,20 +37,78 @@ export function AppSidebar({ activeSection, onSectionChange }: AppSidebarProps) 
             Cryptography
           </h2>
           <div className="space-y-1">
-            {items.map((item) => (
+            {/* Encrypt Section */}
+            <div className="space-y-1">
               <button
-                key={item.title}
-                onClick={() => onSectionChange(item.value as "encrypt" | "decrypt" | "analysis")}
-                className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  activeSection === item.value
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
+                onClick={() => handleMainButtonClick("encrypt")}
+                className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-muted ${
+                  expandedSection === "encrypt" ? "bg-muted" : ""
                 }`}
               >
-                <item.icon className="h-5 w-5" />
-                {item.title}
+                <Lock className="h-5 w-5" />
+                Encrypt
               </button>
-            ))}
+              {expandedSection === "encrypt" && (
+                <div className="ml-6 space-y-1">
+                  {encryptItems.map((item) => (
+                    <button
+                      key={item.value}
+                      onClick={() => onSectionChange(item.value)}
+                      className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeSection === item.value
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Decrypt Section */}
+            <div className="space-y-1">
+              <button
+                onClick={() => handleMainButtonClick("decrypt")}
+                className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-muted ${
+                  expandedSection === "decrypt" ? "bg-muted" : ""
+                }`}
+              >
+                <Unlock className="h-5 w-5" />
+                Decrypt
+              </button>
+              {expandedSection === "decrypt" && (
+                <div className="ml-6 space-y-1">
+                  {decryptItems.map((item) => (
+                    <button
+                      key={item.value}
+                      onClick={() => onSectionChange(item.value)}
+                      className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        activeSection === item.value
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted"
+                      }`}
+                    >
+                      {item.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Analysis Section 
+            <button
+              onClick={() => onSectionChange("analysis")}
+              className={`w-full flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeSection === "analysis"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
+              }`}
+            >
+              <Search className="h-5 w-5" />
+              Analysis
+            </button>*/}
           </div>
         </div>
       </div>
