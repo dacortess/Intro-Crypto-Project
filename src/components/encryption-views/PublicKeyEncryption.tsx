@@ -6,17 +6,24 @@ const PUBLIC_KEY_METHODS = [
     value: "rsa", 
     label: "RSA", 
     params: ["primeP", "primeQ"],
+    paramOptions: {
+      primeP: ["2", "3", "5", "7", "11", "13", "17", "19", "23", "29", "31", "37", "41", "43", "47", "53", "59", "61", "67", "71", "73", "79", "83", "89", "97"],
+      primeQ: ["2", "3", "5", "7", "11", "13", "17", "19", "23", "29", "31", "37", "41", "43", "47", "53", "59", "61", "67", "71", "73", "79", "83", "89", "97"]
+    },
     paramPlaceholders: {
-      primeP: "Enter prime number P",
-      primeQ: "Enter prime number Q"
+      primeP: "Select prime number P",
+      primeQ: "Select prime number Q"
     }
   },
   { 
-    value: "elgammal", 
+    value: "elgamal", 
     label: "ElGammal", 
-    params: ["keySize"],
+    params: ["key_size"],
     paramOptions: {
-      keySize: ["1024", "2048"]
+      key_size: ["1024", "2048"]
+    },
+    paramPlaceholders: {
+      key_size: "Select key size"
     }
   }
 ];

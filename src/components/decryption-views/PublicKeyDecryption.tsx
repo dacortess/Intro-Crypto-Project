@@ -5,10 +5,10 @@ const PUBLIC_KEY_METHODS = [
   { 
     value: "rsa", 
     label: "RSA", 
-    params: ["n", "b"],
+    params: ["n", "privateKey"],
     paramPlaceholders: {
       n: "Enter parameter N",
-      b: "Enter parameter B"
+      privateKey: "Enter the private key"
     }
   },
   { 

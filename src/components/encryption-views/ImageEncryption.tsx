@@ -46,8 +46,17 @@ export function ImageEncryption() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement actual image encryption
-      const result = await encryptText(selectedImage.name, "aes-image", { key });
+      // Create paths for input and output images
+      const inputPath = `temp/${selectedImage.name}`;
+      const outputPath = `temp/encrypted_${selectedImage.name}`;
+
+      // TODO: Save the image to inputPath before encryption
+      const result = await encryptText(selectedImage.name, "image", {
+        input_image_path: inputPath,
+        output_image_path: outputPath,
+        key: key
+      });
+      
       toast({
         title: "Success",
         description: "Image encrypted successfully",

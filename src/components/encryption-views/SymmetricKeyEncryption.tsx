@@ -25,7 +25,7 @@ const SYMMETRIC_METHODS = [
       key: "Enter key",
       mode: "Select mode"
     }
-  },
+  }
 ];
 
 export function SymmetricKeyEncryption() {

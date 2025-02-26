@@ -5,14 +5,14 @@ const DIGITAL_SIGNATURE_METHODS = [
   { 
     value: "dsa", 
     label: "Validate DSA", 
-    params: ["signature", "IV"],
+    params: ["signature", "publicKey"],
     paramPlaceholders: {
       signature: "Enter Base64 encoded signature",
-      IV: "Enter Base64 encoded initialization vector"
+      publicKey: "Enter Base64 encoded public key"
     },
     paramWarnings: {
       signature: "Must be Base64 encoded",
-      IV: "Must be Base64 encoded"
+      publicKey: "Must be Base64 encoded"
     },
     inputWarning: "Input text must be Base64 encoded"
   }

@@ -10,29 +10,29 @@ const SYMMETRIC_METHODS = [
       mode: ["CBC", "CFB", "OFB", "CTR", "ECB"]
     },
     paramPlaceholders: {
-      key: "Enter Base64 encoded key",
+      key: "Enter key",
       IV: "Enter Base64 encoded initialization vector",
       mode: "Select mode"
     },
     paramWarnings: {
-      key: "Must be Base64 encoded",
-      IV: "Must be Base64 encoded"
+      IV: "Must be Base64 encoded (not required in ECB mode)"
     },
     inputWarning: "Input text must be Base64 encoded"
   },
   { 
     value: "des", 
     label: "DES", 
-    params: ["key", "mode"],
+    params: ["key", "IV", "mode"],
     paramOptions: {
       mode: ["CBC", "CFB", "OFB", "CTR", "ECB"]
     },
     paramPlaceholders: {
-      key: "Enter Base64 encoded key",
+      key: "Enter key",
+      IV: "Enter Base64 encoded initialization vector ",
       mode: "Select mode"
     },
     paramWarnings: {
-      key: "Must be Base64 encoded"
+      IV: "Must be Base64 encoded (not required in ECB mode)"
     },
     inputWarning: "Input text must be Base64 encoded"
   },

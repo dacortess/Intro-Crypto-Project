@@ -25,25 +25,6 @@ interface CryptoSectionProps {
   actionLabel: string;
 }
 
-const PARAM_OPTIONS = {
-  caesar: {
-    a: ["1", "3", "5", "7", "9", "11", "15", "17", "19", "21", "23", "25"],
-    b: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"],
-  },
-  permutation: {
-    a: [],
-    b: [],
-  },
-  hill: {
-    a: [],
-    b: [],
-  },
-  vigenere: {
-    a: [],
-    b: [],
-  },
-};
-
 export function CryptoSection({ title, methods, onProcess, actionLabel }: CryptoSectionProps) {
   const [inputText, setInputText] = useState("");
   const [method, setMethod] = useState("");
@@ -89,15 +70,19 @@ export function CryptoSection({ title, methods, onProcess, actionLabel }: Crypto
     setIsLoading(true);
     try {
       const result = await onProcess(inputText, method, params);
+      if (result.startsWith('Error')) {
+        throw new Error(result);
+      }
       setOutputText(result);
       toast({
         title: "Success",
         description: "Text processed successfully",
       });
     } catch (error) {
+      console.error('Process error:', error);
       toast({
         title: "Error",
-        description: "Failed to process text",
+        description: error instanceof Error ? error.message : "Failed to process text",
         variant: "destructive",
       });
     } finally {
@@ -167,16 +152,16 @@ export function CryptoSection({ title, methods, onProcess, actionLabel }: Crypto
                     placeholder="Enter matrix elements separated by spaces and rows by newlines (e.g., '[2 1, 1 3]')"
                     className="font-mono"
                   />
-                ) : param === "mode" || param === "keySize" ? (
+                ) : selectedMethod.paramOptions?.[param] ? (
                   <Select
                     value={params[param] || ""}
                     onValueChange={(value) => handleParamChange(param, value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={`Select ${param.toLowerCase().replace(/([A-Z])/g, ' $1')}`} />
+                      <SelectValue placeholder={selectedMethod.paramPlaceholders?.[param] || `Select ${param}`} />
                     </SelectTrigger>
                     <SelectContent>
-                      {selectedMethod.paramOptions?.[param]?.map((option) => (
+                      {selectedMethod.paramOptions[param].map((option) => (
                         <SelectItem key={option} value={option}>
                           {option}
                         </SelectItem>
@@ -206,15 +191,17 @@ export function CryptoSection({ title, methods, onProcess, actionLabel }: Crypto
 
         {outputText && (
           <div className="space-y-2">
-            <div className="flex items-start gap-2">
+            <label className="text-sm font-medium">Output</label>
+            <div className="relative">
               <Textarea
                 value={outputText}
                 readOnly
-                className="min-h-[200px] font-mono bg-muted"
+                className="font-mono min-h-[100px] whitespace-pre-wrap p-4 bg-muted"
               />
               <Button
-                variant="outline"
                 size="icon"
+                variant="ghost"
+                className="absolute top-2 right-2 hover:bg-background/50"
                 onClick={handleCopy}
                 disabled={isCopying}
               >

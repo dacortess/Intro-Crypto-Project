@@ -5,9 +5,9 @@ const DIGITAL_SIGNATURE_METHODS = [
   { 
     value: "dsa", 
     label: "DSA", 
-    params: ["keySize"],
+    params: ["key_size"],
     paramOptions: {
-      keySize: ["1024", "2048", "3072"]
+      key_size: ["1024", "2048", "3072"]
     }
   }
 ];
