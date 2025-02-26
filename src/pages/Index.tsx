@@ -6,6 +6,8 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
+import { Home } from "@/components/Home";
+
 // Import encryption views
 import { ClassicEncryption } from "@/components/encryption-views/ClassicEncryption";
 import { SymmetricKeyEncryption } from "@/components/encryption-views/SymmetricKeyEncryption";
@@ -21,7 +23,7 @@ import { DigitalSignatureVerification } from "@/components/decryption-views/Digi
 import { ImageDecryption } from "@/components/decryption-views/ImageDecryption";
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState("encrypt-classic");
+  const [activeSection, setActiveSection] = useState("Cryptography");
 
   const getSectionTitle = () => {
     const sections: Record<string, string> = {
@@ -42,6 +44,8 @@ const Index = () => {
 
   const renderActiveSection = () => {
     switch (activeSection) {
+      case "Cryptography":
+        return <Home />;
       case "encrypt-classic":
         return <ClassicEncryption />;
       case "encrypt-symmetric":
