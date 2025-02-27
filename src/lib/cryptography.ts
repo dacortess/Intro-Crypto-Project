@@ -79,6 +79,16 @@ interface ImageDecryptionResponse {
   decrypted_image_url: string;
 }
 
+interface FileSignatureResponse {
+  signature: string;
+  publicKey: string;
+  privateKey: string;
+}
+
+interface FileVerificationResponse {
+  verification_result: string;
+}
+
 export async function encryptText(text: string, method: string, params: Record<string, string>): Promise<string> {
   try {
     // Validate input
@@ -228,6 +238,46 @@ export async function decryptImage(image: File, key: string, iv: string): Promis
     };
   } catch (error) {
     console.error('Error decrypting image:', error);
+    throw error;
+  }
+}
+
+export async function signFile(file: File): Promise<FileSignatureResponse> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const result = await executePythonOperationWithFile('/sign-file', formData);
+    console.log(result);
+    return {
+      signature: result.signature,
+      publicKey: result.publicKey,
+      privateKey: result.privateKey
+    };
+  } catch (error) {
+    console.error('Error signing file:', error);
+    throw error;
+  }
+}
+
+export async function verifyFileSignature(
+  file: File, 
+  signature: string, 
+  publicKey: string
+): Promise<FileVerificationResponse> {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('signature', signature);
+    formData.append('public_key', publicKey);
+
+    const result = await executePythonOperationWithFile('/verify-file', formData);
+    console.log(result);
+    return {
+      verification_result: result.verification_result
+    };
+  } catch (error) {
+    console.error('Error verifying file signature:', error);
     throw error;
   }
 }
