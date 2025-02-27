@@ -52,7 +52,7 @@ export function FileVerification() {
     setIsLoading(true);
     try {
       const result = await verifyFileSignature(selectedFile, signature, publicKey);
-      setVerificationResult(result.validity);
+      setVerificationResult(result.verification_result);
       
       toast({
         title: "Success",
