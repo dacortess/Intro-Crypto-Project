@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { decryptText } from "@/lib/cryptography";
+import { decryptImage } from "@/lib/cryptography";
+import { Download } from "lucide-react";
 
 export function ImageDecryption() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -10,12 +11,14 @@ export function ImageDecryption() {
   const [key, setKey] = useState("");
   const [iv, setIv] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [decryptedImageUrl, setDecryptedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedImage(file);
+      setDecryptedImageUrl(null); // Reset decrypted image URL
 
       // Create preview URL
       const reader = new FileReader();
@@ -24,6 +27,22 @@ export function ImageDecryption() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleDownload = () => {
+    if (!decryptedImageUrl || !selectedImage) return;
+    
+    const link = document.createElement('a');
+    link.href = decryptedImageUrl;
+    link.download = `decrypted_${selectedImage.name}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Success",
+      description: "Decrypted image downloaded successfully",
+    });
   };
 
   const handleDecrypt = async () => {
@@ -48,7 +67,7 @@ export function ImageDecryption() {
     if (!iv) {
       toast({
         title: "Error",
-        description: "Please enter the initialization vector",
+        description: "Please enter the initialization vector (IV)",
         variant: "destructive",
       });
       return;
@@ -56,8 +75,11 @@ export function ImageDecryption() {
 
     setIsLoading(true);
     try {
-      // TODO: Implement actual image decryption
-      const result = await decryptText(selectedImage.name, "aes-image", { key, iv });
+      const result = await decryptImage(selectedImage, key, iv);
+      
+      // Store the decrypted image URL
+      setDecryptedImageUrl(result.decrypted_image_url);
+      
       toast({
         title: "Success",
         description: "Image decrypted successfully",
@@ -94,15 +116,12 @@ export function ImageDecryption() {
             type="text"
             value={iv}
             onChange={(e) => setIv(e.target.value)}
-            placeholder="Enter Base64 encoded initialization vector"
+            placeholder="Enter the IV used for encryption"
           />
-          <p className="text-sm text-yellow-600 dark:text-yellow-500">
-            ⚠️ Must be Base64 encoded
-          </p>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Image</label>
+          <label className="text-sm font-medium">Encrypted Image</label>
           <div className="flex items-center gap-4">
             <Input
               type="file"
@@ -115,24 +134,32 @@ export function ImageDecryption() {
 
         {imagePreview && (
           <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Preview:</p>
-            <div className="border rounded-lg p-2 w-48">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-auto rounded object-contain"
-              />
-            </div>
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="max-w-md rounded-lg border border-border"
+            />
           </div>
         )}
 
-        <Button 
+        <Button
           onClick={handleDecrypt}
-          className="w-full bg-crypto-warning hover:bg-crypto-warning/90"
-          disabled={isLoading}
+          disabled={!selectedImage || !key || !iv || isLoading}
+          className="w-full"
         >
           {isLoading ? "Decrypting..." : "Decrypt Image"}
         </Button>
+
+        {decryptedImageUrl && (
+          <Button
+            onClick={handleDownload}
+            className="w-full bg-primary/20 hover:bg-primary/30"
+            variant="outline"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download Decrypted Image
+          </Button>
+        )}
       </div>
     </div>
   );

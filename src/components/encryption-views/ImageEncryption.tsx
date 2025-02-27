@@ -2,19 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { encryptText } from "@/lib/cryptography";
+import { encryptImage } from "@/lib/cryptography";
+import { Download } from "lucide-react";
 
 export function ImageEncryption() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [key, setKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [iv, setIv] = useState<string | null>(null);
+  const [encryptedImageUrl, setEncryptedImageUrl] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedImage(file);
+      setIv(null); // Reset IV when new image is selected
+      setEncryptedImageUrl(null); // Reset encrypted image URL
 
       // Create preview URL
       const reader = new FileReader();
@@ -23,6 +28,22 @@ export function ImageEncryption() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleDownload = () => {
+    if (!encryptedImageUrl || !selectedImage) return;
+    
+    const link = document.createElement('a');
+    link.href = encryptedImageUrl;
+    link.download = `encrypted_${selectedImage.name}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Success",
+      description: "Encrypted image downloaded successfully",
+    });
   };
 
   const handleEncrypt = async () => {
@@ -46,16 +67,11 @@ export function ImageEncryption() {
 
     setIsLoading(true);
     try {
-      // Create paths for input and output images
-      const inputPath = `temp/${selectedImage.name}`;
-      const outputPath = `temp/encrypted_${selectedImage.name}`;
-
-      // TODO: Save the image to inputPath before encryption
-      const result = await encryptText(selectedImage.name, "image", {
-        input_image_path: inputPath,
-        output_image_path: outputPath,
-        key: key
-      });
+      const result = await encryptImage(selectedImage, key);
+      
+      // Store the encrypted image URL and IV
+      setEncryptedImageUrl(result.encrypted_image_url);
+      setIv(result.iv);
       
       toast({
         title: "Success",
@@ -101,24 +117,39 @@ export function ImageEncryption() {
 
         {imagePreview && (
           <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Preview:</p>
-            <div className="border rounded-lg p-2 w-48">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-auto rounded object-contain"
-              />
-            </div>
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="max-w-md rounded-lg border border-border"
+            />
           </div>
         )}
 
-        <Button 
+        <Button
           onClick={handleEncrypt}
-          className="w-full bg-crypto-warning hover:bg-crypto-warning/90"
-          disabled={isLoading}
+          disabled={!selectedImage || !key || isLoading}
+          className="w-full"
         >
           {isLoading ? "Encrypting..." : "Encrypt Image"}
         </Button>
+
+        {encryptedImageUrl && (
+          <Button
+            onClick={handleDownload}
+            className="w-full bg-primary/20 hover:bg-primary/30"
+            variant="outline"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download Encrypted Image
+          </Button>
+        )}
+
+        {iv && (
+          <div className="mt-4 p-4 bg-muted rounded-lg">
+            <p className="text-sm font-medium">Initialization Vector (IV):</p>
+            <p className="font-mono text-sm break-all">{iv}</p>
+          </div>
+        )}
       </div>
     </div>
   );

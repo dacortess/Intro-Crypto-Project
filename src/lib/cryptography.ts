@@ -24,6 +24,29 @@ async function executePythonOperation(scriptName: string, data: any): Promise<an
   }
 }
 
+// Helper function to execute Python operation with file upload
+async function executePythonOperationWithFile(scriptName: string, formData: FormData): Promise<any> {
+  try {
+    console.log(`Sending file request to ${scriptName}`);
+    const response = await fetch(`https://dacortess.pythonanywhere.com${scriptName}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log(`Response from ${scriptName}:`, result);
+    return result;
+  } catch (error) {
+    console.error(`Error executing Python operation:`, error);
+    throw error;
+  }
+}
+
 interface EncryptionResponse {
   'Encrypted text': string;
   'Key': string;
@@ -45,6 +68,15 @@ interface DecryptionResponse {
 
 interface AnalysisResponse {
   'Analysis result': string;
+}
+
+interface ImageEncryptionResponse {
+  encrypted_image_url: string;
+  iv: string;
+}
+
+interface ImageDecryptionResponse {
+  decrypted_image_url: string;
 }
 
 export async function encryptText(text: string, method: string, params: Record<string, string>): Promise<string> {
@@ -161,5 +193,41 @@ export async function analyzeText(text: string, method: string): Promise<string>
       return `Error during analysis: ${error.message}`;
     }
     return 'Error during analysis';
+  }
+}
+
+export async function encryptImage(image: File, key: string): Promise<ImageEncryptionResponse> {
+  try {
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('key', key);
+
+    const result = await executePythonOperationWithFile('/encrypt-image', formData);
+    console.log(result);
+    return {
+      encrypted_image_url: result.encrypted_image_url,
+      iv: result.iv
+    };
+  } catch (error) {
+    console.error('Error encrypting image:', error);
+    throw error;
+  }
+}
+
+export async function decryptImage(image: File, key: string, iv: string): Promise<ImageDecryptionResponse> {
+  try {
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('key', key);
+    formData.append('iv', iv);
+
+    const result = await executePythonOperationWithFile('/decrypt-image', formData);
+    console.log(result);
+    return {
+      decrypted_image_url: result.decrypted_image_url
+    };
+  } catch (error) {
+    console.error('Error decrypting image:', error);
+    throw error;
   }
 }

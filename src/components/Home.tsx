@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
           paragraph 
           sx={{ fontFamily: 'JetBrains Mono' }}
         >
-          Project for Intro. Cryptography subject
+          Project for the subject Intro. Cryptography
         </Typography>
         <Typography 
           variant="subtitle1" 
